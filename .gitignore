@@ -29,3 +29,10 @@ hs_err_pid*
 *.gz
 *.toc
 *.out
+
+
+#helper files
+conference_101719.tex
+*.bbl
+*.blg
+references.bib

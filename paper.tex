@@ -1,23 +1,74 @@
-\documentclass{article}
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
 
 \usepackage{listings}
 \usepackage{hyperref}
-
+\usepackage{amsmath}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
-\author{Dalton Kajander, Shawn Guydeene, Blake Celestian}
-\title{Concurrent Hash Tables in Java}
-\date{\today{}}
+\title{Implementation of Concurrent Hash Tables in Java}
+
+\author{\IEEEauthorblockN{ Shawn Guydeene}
+\and
+\IEEEauthorblockN{ Dalton Kajander}
+\and
+\IEEEauthorblockN{ Blake Celestian}
+}
+
 \maketitle
 
-\newpage
-\tableofcontents
-\newpage
+\begin{abstract}
+Abstract goes here.
+\end{abstract}
 
-\section{The Problem}
-What problem?
+\begin{IEEEkeywords}
+Concurrent Programming, Hash-table representations
+\end{IEEEkeywords}
+
+\section{Introduction}
+The problem that our group chose to tackle, is how one would parallelize a hash table, and see how much of a performance increase,
+if any would arise from such an implementation. This paper seeks to explain the how hash tables function as a data structure, previous
+attempts at parallelizing them, our group's attempt at creating a concurrent hash table, and experimental data collected showing the
+effects of parallelizing on runtime for the program.
 
 \section{Research}
-Oh, that problem.
+\subsection{What are Hash Tables?}
+Hash tables are a data structure that utilizes an associative array, which is a structure that associates keys to specific values, in order to store data. The way
+in which a hash table uses these keys, is by entering them into a hash function. The hash function will then compute the array index in which
+the value associated with the key will be stored. The hash function is naturally the most important portion of the hash table's construction.
+The most commonly used hashing methods uses some variation of modular hashing. Modular hashing works as follows: assuming there is an array of size
+$M$, where $M$ is prime, then for any positive integer key $k$, compute $k \mod{M}$. 
+
+Modular hashing is exapandable to accepting more than just integer as keys. A common data type used as a key for hash tables would be strings.
+In order to accomplish this, one would simply have to treat the string as though it were a large integer. This concept of converting data types into
+integers is commonly used as it is much simpler than creating a custom hashing function. A well made hash function will have three main requirements:
+deterministic - equivalent keys will always produce the same hash value, computationally efficient, and allows for keys to be uniformly distributed.
+Deterministic is only one of those requirements that is absolutely necessary for any hash function, as it what allows users to searh hash tables
+for a specific key-value pairing [1].
+
+There is of course, one issue with the hash function: since the hash table is not an array of infinite size, there is guaranteed to be instances where
+two distinct keys map to the same index when using the hash function. In order to resolve this, several techniques have been developed: linear probing,
+quadratic probing, double hashing, separate chaining or buckets. The basic concept for linear probing is that if the current key-value attempting to be
+entered into the hash table collides at position $i$, then attempt to place it at $i+1$. If it collides again, keep increasing the index by $1$ until
+it comes across an index in the hash table array that has not been used yet, ending at $i+n$ where $n$ is the number of collisions. Quadratic probing is
+similar to linear probing, except instead of ending up at $i+n$, the value will be stored at index $i+n^2$, where $n$ is the number of collisions.
+Double hashing, also known as rehashing, involves hashing the key a second time, with a different hash function. That result is taken, and then used as
+the step size for a process similar to the previous two methods, resulting in the value being place at index $i+jn$, where $n$ is the number of collisions,
+and $j$ is the result of the second hash function. These methods, known as open addresssing, work, but as the hash table begins to fill up, they result in the 
+add() operation taking more time to complete due to collisions. Separate chaining, on the other hand, works by having each index of the array be a linked list. 
+Whenever a value maps to thatindex, it will be added into list, which avoids the issue that open addressing presents. Buckets is a similar method to 
+separate chaining, using an array instead of a linked list. While separate chaining and buckets fix the issues with open addressing, they present more
+of their own, namely that there exist the possibility that a large majority of keys will map to the same index, which leads to a large amount of time
+being used searching the array or list at that index for the specified key's value [2].
+
+\subsection{What is Concurrency?}
+Now given what a hash table is, this paper will look at what exactly it means for a computer program to be concurrent. Concurreny means that multiple computations
+will be occuring at the same time. This has become increasing more important, with the clock speed of processors no longer increasing, it results in 
+manufacturers adding more cores to chips, meaning splitting up computation among those chips is the only way to make it faster. Concurrent programming
+has two common models: shared memory models and message passing models. This paper will only look at shared memory models as the implementation for
+a concurrent hash table will utilize a shared memory model. A shared memory model works by having concurrent processors read and write objects into the
+memory that they share [3].
 
 \section{Related work}
 I've seen a similar problem before
@@ -41,28 +92,14 @@ class HashTable<T> {
 \end{lstlisting}
 
 \section{Experimental Results}
-Well, it worked on my machine. 
+Well, it worked on my machine.
 
+\section{Appendix}
 
-
-\newpage
-\section{Description and Requirements}
-The purpose of the project is to give you a chance to explore in some depth a topic that is related to the subject matter of this course. The project consists of two parts, an activity and a report. Your final report must present original work on a challenging problem.
-\begin{enumerate}
-    \item The activity involves scholarly work—exploring a topic, reading relevant literature, writing software, and running experiments—and must include either a substantial amount of programming or a strong theoretical mathematical treaty of issues related to multicore programming.
-    \item The final report is a short paper (6-10 pages) describing the results of the activity and should reflect the substantial amount of work that you put into the activity. The paper should make clear what is the problem, the state-of-the art in this research area, a discussion of related work, a clear definition of the contributions of your paper, a detailed discussion of your algorithms and approach and their application, and performed experimental results. The report will be graded for writing quality as well as for technical content, so attention should be paid to organization, grammar, spelling, and scholarly style. All references used, both text and code, must be properly cited in the bibliography. Your are required to use LaTeX (\url{http://en.wikipedia.org/wiki/LaTeX} (Links to an external site.)) to prepare your report.
-    \item Source code: typically in the course of your research you will develop source code for your algorithms and experimental results. Please include with your mid-term and final reports the following:
-    \begin{enumerate}
-        \item The source code of your algorithms along with a brief README file
-        \item The source code of your experiments along with a brief README file
-        \item The source code of your paper (in a LaTeX format).
-    \end{enumerate}
-\end{enumerate}
-\textit{Submission} \\
-All materials should be submitted online using Webcourses as a single zip or rar archive. \\
-\textit{Format} \\
-All papers should follow either the ACM or the IEEE Manuscript Format. \\
-A sample IEEE template and further formatting instructions are available here: \\
-\url{http://www.ieee.org/conferences_events/conferences/publishing/templates.html}
-
+\begin{thebibliography}{00}
+\bibitem{b1} R. Sedgewick and K. Wayne. "Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
+\bibitem{b2} S. Mitra. "Hashing." utexas.edu. https://www.cs.utexas.edu/~mitra/\\csSpring2017/cs313/lectures/hash.html (accessed Mar. 13, 2022).
+\bibitem{b3} S. Amarasinghe, A. Chlipala, S. Devadas, M. Ernst, M. Goldman, J. Guttag, D. Jackson, R. Miller, M. Rinard, and A. Solar-Lezama. "Reading 17: Concurrency"
+mit.edu. https://web.mit.edu/6.005/\\www/fa14/classes/17-concurrency/ (accessed Mar. 14, 2022).
+\end{thebibliography}
 \end{document}
