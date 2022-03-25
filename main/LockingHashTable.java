@@ -1,11 +1,11 @@
-public class HashTable {
+public class LockingHashTable {
     public static final int ARR_SIZE = 809; // The maximum capacity of a HashTable
     private int[] table = new int[ARR_SIZE]; // Where values are stored
     private boolean[] nulls = new boolean[ARR_SIZE]; // If a value is null, it is true at the same index here
     private boolean[] cleans = new boolean[ARR_SIZE]; // Where clean indices are stored
     private int capacity;
 
-    public HashTable() {
+    public LockingHashTable() {
         // Generate arrays, each with default values. Set capacity to 0
         for (int i = 0; i < ARR_SIZE; i++) {
             table[i] = 0;
@@ -16,7 +16,7 @@ public class HashTable {
     }
 
     // Add an item to the hash table
-    public void put(int item) {
+    public synchronized void put(int item) {
         // If capacity if full, do not add
         if (capacity >= ARR_SIZE)
             return;
@@ -48,7 +48,7 @@ public class HashTable {
     }
 
     // Search the hash table for a specific item, return true if found, else false
-    public boolean search(int item) {
+    public synchronized boolean search(int item) {
         int key = hash(item);
         int i = 0;
         int new_key = (key + (i * i)) % ARR_SIZE;
@@ -68,7 +68,7 @@ public class HashTable {
     }
 
     // Removes an item from the hash table
-    public void remove(int item) {
+    public synchronized void remove(int item) {
         int key = hash(item);
         int i = 0;
         int new_key = (key + (i * i)) % ARR_SIZE;
@@ -127,5 +127,4 @@ public class HashTable {
 
         return s;
     }
-
 }
