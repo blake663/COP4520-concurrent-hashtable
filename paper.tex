@@ -19,7 +19,7 @@
 \maketitle
 
 \begin{abstract}
-
+    Concurrent programming is using multiple processes at the same time, often reducing total time waiting for operations to complete. A concurrent hash table is a hash table that utilizes concurrent programming in order to reduce the time it takes to do multiple operations, such as the add(), search(), and remove() methods hash tables utilize. It does this by doing different operations at the same time instead of one after another, waiting for the previous to finish before the next can even start. This report is about attempting to create our own concurrent hash table in the Java language instead of using Java’s own HashTable class. We will be achieving this by using function keywords like “synchronized” and manually locking and unlocking, experimenting will both options. We will show evidence of reduced time by running the same commands on an unthreaded custom HashTable and on a custom concurrent HashTable.
 \end{abstract}
 
 \begin{IEEEkeywords}
