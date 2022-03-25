@@ -62,6 +62,14 @@ separate chaining, using an array instead of a linked list. While separate chain
 of their own, namely that there exist the possibility that a large majority of keys will map to the same index, which leads to a large amount of time
 being used searching the array or list at that index for the specified key's value [2].
 
+\subsection{What is Concurrency?}
+Now given what a hash table is, this paper will look at what exactly it means for a computer program to be concurrent. Concurreny means that multiple computations
+will be occuring at the same time. This has become increasing more important, with the clock speed of processors no longer increasing, it results in 
+manufacturers adding more cores to chips, meaning splitting up computation among those chips is the only way to make it faster. Concurrent programming
+has two common models: shared memory models and message passing models. This paper will only look at shared memory models as the implementation for
+a concurrent hash table will utilize a shared memory model. A shared memory model works by having concurrent processors read and write objects into the
+memory that they share [3].
+
 \section{Related work}
 I've seen a similar problem before
 
@@ -84,15 +92,14 @@ class HashTable<T> {
 \end{lstlisting}
 
 \section{Experimental Results}
-Well, it worked on my machine. 
+Well, it worked on my machine.
+
+\section{Appendix}
 
 \begin{thebibliography}{00}
-\bibitem{b1} R. Sedgewick and K. Wayne. "Hash Tables" princeton.edu \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022)
-\bibitem{b2} J. Clerk Maxwell, A Treatise on Electricity and Magnetism, 3rd ed., vol. 2. Oxford: Clarendon, 1892, pp.68--73.
-\bibitem{b3} I. S. Jacobs and C. P. Bean, ``Fine particles, thin films and exchange anisotropy,'' in Magnetism, vol. III, G. T. Rado and H. Suhl, Eds. New York: Academic, 1963, pp. 271--350.
-\bibitem{b4} K. Elissa, ``Title of paper if known,'' unpublished.
-\bibitem{b5} R. Nicole, ``Title of paper with only first word capitalized,'' J. Name Stand. Abbrev., in press.
-\bibitem{b6} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ``Electron spectroscopy studies on magneto-optical media and plastic substrate interface,'' IEEE Transl. J. Magn. Japan, vol. 2, pp. 740--741, August 1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
-\bibitem{b7} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
+\bibitem{b1} R. Sedgewick and K. Wayne. "Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
+\bibitem{b2} S. Mitra. "Hashing." utexas.edu. https://www.cs.utexas.edu/~mitra/\\csSpring2017/cs313/lectures/hash.html (accessed Mar. 13, 2022).
+\bibitem{b3} S. Amarasinghe, A. Chlipala, S. Devadas, M. Ernst, M. Goldman, J. Guttag, D. Jackson, R. Miller, M. Rinard, and A. Solar-Lezama. "Reading 17: Concurrency"
+mit.edu. https://web.mit.edu/6.005/\\www/fa14/classes/17-concurrency/ (accessed Mar. 14, 2022).
 \end{thebibliography}
 \end{document}
