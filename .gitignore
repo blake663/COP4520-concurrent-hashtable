@@ -27,3 +27,6 @@ hs_err_pid*
 *.gz
 *.toc
 *.out
+
+#helper file
+conference_101719.tex
