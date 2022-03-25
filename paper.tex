@@ -12,16 +12,34 @@
 \tableofcontents
 \newpage
 
-\section{Source code}
-\subsection{Java code}
+\section{The Problem}
+What problem?
+
+\section{Research}
+Oh, that problem.
+
+\section{Related work}
+I've seen a similar problem before
+
+\section{Contributions}
+I've fixed this problem once
+
+\section{Algorithms}
+And this is how I did it!
 \begin{lstlisting}[language={Java},caption=Testing surce code in \LaTeX{}.,breaklines=true,frame=single]
-class HashTableCon {
+class HashTable<T> {
+    bool isConcurrent;
     public static void main(String[] args) {
-        bool isConcurrent = true;
+        isConcurrent = true;
+    }
+
+    public HashTable<T>(bool isConcurrent) {
+        this.isConcurrent = isConcurrent;
     }
 }
 \end{lstlisting}
-\subsection{Reasoning}
-Because I said so, that's why. 
+
+\section{Experimental Results}
+Well, it worked on my machine. 
 
 \end{document}
