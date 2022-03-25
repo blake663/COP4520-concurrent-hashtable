@@ -1,6 +1,4 @@
 import java.text.ParseException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.*;
 
 public class Experiment {
     public static void main(String[] args) throws ParseException, InterruptedException {
