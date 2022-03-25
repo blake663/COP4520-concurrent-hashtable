@@ -19,7 +19,7 @@
 \maketitle
 
 \begin{abstract}
-Abstract goes here.
+
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -70,12 +70,6 @@ has two common models: shared memory models and message passing models. This pap
 a concurrent hash table will utilize a shared memory model. A shared memory model works by having concurrent processors read and write objects into the
 memory that they share [3].
 
-\section{Related work}
-I've seen a similar problem before
-
-\section{Contributions}
-I've fixed this problem once
-
 \section{Algorithms}
 And this is how I did it!
 \begin{lstlisting}[language={Java},caption=Testing surce code in \LaTeX{}.,breaklines=true,frame=single]
@@ -92,9 +86,22 @@ class HashTable<T> {
 \end{lstlisting}
 
 \section{Experimental Results}
-Well, it worked on my machine.
+We begin by testing how the standard hash table will performed when run sequentially, and then when multithreaded.
 
 \section{Appendix}
+\subsection{Challenges}
+One of the major challenges the group came across was learning how to do concurrent programming within Java, as most of the group member's experience
+lay in C++.
+\subsection{Completed Tasks}
+\begin{itemize}
+    \item Creating a standard hash table.
+    \item Creating a hash table with locks.
+\end{itemize}
+\subsection{Remaining Tasks}
+\begin{itemize}
+    \item Creating a lockfree hash table.
+    \item More experimental testing.
+\end{itemize}
 
 \begin{thebibliography}{00}
 \bibitem{b1} R. Sedgewick and K. Wayne. "Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
