@@ -40,11 +40,11 @@ the value associated with the key will be stored. The hash function is naturally
 The most commonly used hashing methods uses some variation of modular hashing. Modular hashing works as follows: assuming there is an array of size
 $M$, where $M$ is prime, then for any positive integer key $k$, compute $k \mod{M}$. 
 
-Modular hashing is exapandable to accepting more than just integer as keys. A common data type used as a key for hash tables would be strings.
+Modular hashing is expandable to accepting more than just integer as keys. A common data type used as a key for hash tables would be strings.
 In order to accomplish this, one would simply have to treat the string as though it were a large integer. This concept of converting data types into
 integers is commonly used as it is much simpler than creating a custom hashing function. A well made hash function will have three main requirements:
 deterministic - equivalent keys will always produce the same hash value, computationally efficient, and allows for keys to be uniformly distributed.
-Deterministic is only one of those requirements that is absolutely necessary for any hash function, as it what allows users to searh hash tables
+Deterministic is only one of those requirements that is absolutely necessary for any hash function, as it what allows users to search hash tables
 for a specific key-value pairing [1].
 
 There is of course, one issue with the hash function: since the hash table is not an array of infinite size, there is guaranteed to be instances where
@@ -55,35 +55,38 @@ it comes across an index in the hash table array that has not been used yet, end
 similar to linear probing, except instead of ending up at $i+n$, the value will be stored at index $i+n^2$, where $n$ is the number of collisions.
 Double hashing, also known as rehashing, involves hashing the key a second time, with a different hash function. That result is taken, and then used as
 the step size for a process similar to the previous two methods, resulting in the value being place at index $i+jn$, where $n$ is the number of collisions,
-and $j$ is the result of the second hash function. These methods, known as open addresssing, work, but as the hash table begins to fill up, they result in the 
+and $j$ is the result of the second hash function. These methods, known as open addressing, work, but as the hash table begins to fill up, they result in the 
 add() operation taking more time to complete due to collisions. Separate chaining, on the other hand, works by having each index of the array be a linked list. 
-Whenever a value maps to thatindex, it will be added into list, which avoids the issue that open addressing presents. Buckets is a similar method to 
+Whenever a value maps to that index, it will be added into list, which avoids the issue that open addressing presents. Buckets is a similar method to 
 separate chaining, using an array instead of a linked list. While separate chaining and buckets fix the issues with open addressing, they present more
 of their own, namely that there exist the possibility that a large majority of keys will map to the same index, which leads to a large amount of time
 being used searching the array or list at that index for the specified key's value [2].
 
 \subsection{What is Concurrency?}
-Now given what a hash table is, this paper will look at what exactly it means for a computer program to be concurrent. Concurreny means that multiple computations
-will be occuring at the same time. This has become increasing more important, with the clock speed of processors no longer increasing, it results in 
+Now given what a hash table is, this paper will look at what exactly it means for a computer program to be concurrent. Concurrency means that multiple computations
+will be occurring at the same time. This has become increasing more important, with the clock speed of processors no longer increasing, it results in 
 manufacturers adding more cores to chips, meaning splitting up computation among those chips is the only way to make it faster. Concurrent programming
 has two common models: shared memory models and message passing models. This paper will only look at shared memory models as the implementation for
 a concurrent hash table will utilize a shared memory model. A shared memory model works by having concurrent processors read and write objects into the
 memory that they share [3].
 
 \section{Algorithms}
-And this is how I did it!
-\begin{lstlisting}[language={Java},caption=Testing surce code in \LaTeX{}.,breaklines=true,frame=single]
-class HashTable<T> {
-    bool isConcurrent;
-    public static void main(String[] args) {
-        isConcurrent = true;
-    }
+% And this is how I did it!
+% \begin{lstlisting}[language={Java},caption=Testing surce code in \LaTeX{}.,breaklines=true,frame=single]
+% class HashTable<T> {
+%     bool isConcurrent;
+%     public static void main(String[] args) {
+%         isConcurrent = true;
+%     }
 
-    public HashTable<T>(bool isConcurrent) {
-        this.isConcurrent = isConcurrent;
-    }
-}
-\end{lstlisting}
+%     public HashTable<T>(bool isConcurrent) {
+%         this.isConcurrent = isConcurrent;
+%     }
+% }
+% \end{lstlisting}
+There are many ways to create single-threaded hash tables, so there are likewise many ways to create concurrent hash tables. If we ignore the need for resizing and
+the choice of hashing algorithm, we still need to decide on an approach for handling contention. We will attempt to employ methods such as course-grain locking, fine-grain locking,
+lazy, optimistic, and lock-free design. 
 
 \section{Experimental Results}
 We begin by testing how the standard hash table will performed when run sequentially, and then when multithreaded.
@@ -99,14 +102,14 @@ lay in C++.
 \end{itemize}
 \subsection{Remaining Tasks}
 \begin{itemize}
-    \item Creating a lockfree hash table.
+    \item Creating a lock-free hash table.
     \item More experimental testing.
 \end{itemize}
 
 \begin{thebibliography}{00}
-\bibitem{b1} R. Sedgewick and K. Wayne. "Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
-\bibitem{b2} S. Mitra. "Hashing." utexas.edu. https://www.cs.utexas.edu/~mitra/\\csSpring2017/cs313/lectures/hash.html (accessed Mar. 13, 2022).
-\bibitem{b3} S. Amarasinghe, A. Chlipala, S. Devadas, M. Ernst, M. Goldman, J. Guttag, D. Jackson, R. Miller, M. Rinard, and A. Solar-Lezama. "Reading 17: Concurrency"
+\bibitem{b1} R. Sedgewick and K. Wayne. ``Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
+\bibitem{b2} S. Mitra. ``Hashing." utexas.edu. https://www.cs.utexas.edu/~mitra/\\csSpring2017/cs313/lectures/hash.html (accessed Mar. 13, 2022).
+\bibitem{b3} S. Amarasinghe, A. Chlipala, S. Devadas, M. Ernst, M. Goldman, J. Guttag, D. Jackson, R. Miller, M. Rinard, and A. Solar-Lezama. ``Reading 17: Concurrency"
 mit.edu. https://web.mit.edu/6.005/\\www/fa14/classes/17-concurrency/ (accessed Mar. 14, 2022).
 \end{thebibliography}
 \end{document}
