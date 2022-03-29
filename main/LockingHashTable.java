@@ -1,5 +1,5 @@
 public class LockingHashTable {
-    public static final int ARR_SIZE = 809; // The maximum capacity of a HashTable
+    public static final int ARR_SIZE = 64708; // The maximum capacity of a HashTable
     private int[] table = new int[ARR_SIZE]; // Where values are stored
     private boolean[] nulls = new boolean[ARR_SIZE]; // If a value is null, it is true at the same index here
     private boolean[] cleans = new boolean[ARR_SIZE]; // Where clean indices are stored
@@ -33,10 +33,10 @@ public class LockingHashTable {
         // Otherwise, quadratically probe for empty indices
         else {
             int i = 1;
-            int new_key = (key + (i * i)) % ARR_SIZE;
+            int new_key = (key + i) % ARR_SIZE;
             while (!nulls[new_key]) {
                 i++;
-                new_key = (new_key + (i * i)) % ARR_SIZE;
+                new_key = (new_key + i) % ARR_SIZE;
             }
             table[new_key] = item;
             nulls[new_key] = false;
@@ -51,7 +51,7 @@ public class LockingHashTable {
     public synchronized boolean search(int item) {
         int key = hash(item);
         int i = 0;
-        int new_key = (key + (i * i)) % ARR_SIZE;
+        int new_key = (key + i) % ARR_SIZE;
         // Quadratically probe for the item
         // Dirty indices are considered to be a collision, the item may of been probed
         // farther down
@@ -60,7 +60,7 @@ public class LockingHashTable {
                 return true;
             }
             i++;
-            new_key = (new_key + (i * i)) % ARR_SIZE;
+            new_key = (new_key + i) % ARR_SIZE;
             if (i >= ARR_SIZE) break;
         }
 
@@ -71,7 +71,7 @@ public class LockingHashTable {
     public synchronized void remove(int item) {
         int key = hash(item);
         int i = 0;
-        int new_key = (key + (i * i)) % ARR_SIZE;
+        int new_key = (key + i) % ARR_SIZE;
 
         // If item not in hash table, no need to look for it again
         if (!search(item)) {
@@ -88,7 +88,7 @@ public class LockingHashTable {
                 break;
             }
             i++;
-            new_key = (new_key + (i * i)) % ARR_SIZE;
+            new_key = (new_key + i) % ARR_SIZE;
         }
 
         // Decrease capacity
@@ -106,7 +106,7 @@ public class LockingHashTable {
 
     // Need to make a better hash function
     private int hash(int item) {
-        return item % 101;
+        return item % 64708;
     }
 
     // Prints the hash table in the same format as Java's own HashTable
