@@ -106,7 +106,7 @@ public class LockingHashTable {
 
     // Need to make a better hash function
     private int hash(int item) {
-        return item % 8089;
+        return item % 64708;
     }
 
     // Prints the hash table in the same format as Java's own HashTable
