@@ -1,5 +1,5 @@
 public class HashTable {
-    public static final int ARR_SIZE = 809; // The maximum capacity of a HashTable
+    public static final int ARR_SIZE = 40024; // The maximum capacity of a HashTable
     private int[] table = new int[ARR_SIZE]; // Where values are stored
     private boolean[] nulls = new boolean[ARR_SIZE]; // If a value is null, it is true at the same index here
     private boolean[] cleans = new boolean[ARR_SIZE]; // Where clean indices are stored
@@ -106,7 +106,7 @@ public class HashTable {
 
     // Need to make a better hash function
     private int hash(int item) {
-        return item % 101;
+        return item % 5003;
     }
 
     // Prints the hash table in the same format as Java's own HashTable
