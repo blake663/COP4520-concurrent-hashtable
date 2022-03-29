@@ -35,11 +35,11 @@ public class Experiment {
             System.out.println("Finished threaded experiment on standard hash table.\n");
     */
 
-            ThreadedExperiment[] locking_experiment = new ThreadedExperiment[8];
+            ThreadedExperiment2[] locking_experiment = new ThreadedExperiment2[8];
             Thread[] locking = new Thread[8];
 
             for (int i = 0; i < 8; i++) {
-                locking_experiment[i] = new ThreadedExperiment(i);
+                locking_experiment[i] = new ThreadedExperiment2(i);
                 locking[i] = new Thread(locking_experiment[i], Integer.toString(i));
             }
 
@@ -126,13 +126,13 @@ class ThreadedExperiment implements Runnable {
 }
 
 class ThreadedExperiment2 implements Runnable {
-    LockingHashTable standard_unthreaded;
+    LockingHashTable threaded;
     public int insertion_failures; // How many times the insertion of a key-value failed.
     public int removal_failures; // How many times the removal of a key-value failed.
     int thread_num;
 
     ThreadedExperiment2(int thread_num) {
-        this.standard_unthreaded = new LockingHashTable();
+        this.threaded = new LockingHashTable();
         this.insertion_failures  = 0;
         this.removal_failures = 0;
         this.thread_num = thread_num;
@@ -140,16 +140,16 @@ class ThreadedExperiment2 implements Runnable {
 
     public void run() {
         for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
-            standard_unthreaded.put(i);
+            threaded.put(i);
         }
         for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
-            if (!standard_unthreaded.search(i)) insertion_failures++;
+            if (!threaded.search(i)) insertion_failures++;
         }
         for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
-            standard_unthreaded.remove(i);
+            threaded.remove(i);
         }
         for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
-            if (standard_unthreaded.search(i)) removal_failures++;
+            if (threaded.search(i)) removal_failures++;
         }
     }
 }
