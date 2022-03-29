@@ -1,5 +1,5 @@
 public class HashTable {
-    public static final int ARR_SIZE = 40024; // The maximum capacity of a HashTable
+    public static final int ARR_SIZE = 64708; // The maximum capacity of a HashTable
     private int[] table = new int[ARR_SIZE]; // Where values are stored
     private boolean[] nulls = new boolean[ARR_SIZE]; // If a value is null, it is true at the same index here
     private boolean[] cleans = new boolean[ARR_SIZE]; // Where clean indices are stored
@@ -22,25 +22,31 @@ public class HashTable {
             return;
 
         // Get key
-        int key = hash(item);
+        long key = hash(item);
 
         // Check if first try addition
-        if (nulls[key]) {
-            table[key] = item;
-            nulls[key] = false;
-            cleans[key] = false;
+        if (nulls[(int)key]) {
+            table[(int)key] = item;
+            nulls[(int)key] = false;
+            cleans[(int)key] = false;
         }
         // Otherwise, quadratically probe for empty indices
         else {
-            int i = 1;
-            int new_key = (key + (i * i)) % ARR_SIZE;
-            while (!nulls[new_key]) {
-                i++;
-                new_key = (new_key + (i * i)) % ARR_SIZE;
+            long i = 1;
+            long new_key = (key + i) % ARR_SIZE;
+            try {
+                while (!nulls[(int)new_key]) {
+                    i++;
+                    //if (item == 64708) System.out.println(String.format("i: %d, key: %d, new key: %d, item: %d", i, key, new_key, item));
+                    new_key = (key + i) % ARR_SIZE;
+                    //if (item == 64708) System.out.println(String.format("i: %d, key: %d, new key: %d, item: %d", i, key, new_key, item));
+                }
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.err.println(String.format("i: %d, key: %d, new key: %d, item: %d", i, key, new_key, item));
             }
-            table[new_key] = item;
-            nulls[new_key] = false;
-            cleans[new_key] = false;
+            table[(int)new_key] = item;
+            nulls[(int)new_key] = false;
+            cleans[(int)new_key] = false;
         }
 
         // Increase capacity
@@ -51,7 +57,7 @@ public class HashTable {
     public boolean search(int item) {
         int key = hash(item);
         int i = 0;
-        int new_key = (key + (i * i)) % ARR_SIZE;
+        int new_key = (key + i) % ARR_SIZE;
         // Quadratically probe for the item
         // Dirty indices are considered to be a collision, the item may of been probed
         // farther down
@@ -60,7 +66,7 @@ public class HashTable {
                 return true;
             }
             i++;
-            new_key = (new_key + (i * i)) % ARR_SIZE;
+            new_key = (key + i) % ARR_SIZE;
             if (i >= ARR_SIZE) break;
         }
 
@@ -71,7 +77,7 @@ public class HashTable {
     public void remove(int item) {
         int key = hash(item);
         int i = 0;
-        int new_key = (key + (i * i)) % ARR_SIZE;
+        int new_key = (key + i) % ARR_SIZE;
 
         // If item not in hash table, no need to look for it again
         if (!search(item)) {
@@ -88,7 +94,7 @@ public class HashTable {
                 break;
             }
             i++;
-            new_key = (new_key + (i * i)) % ARR_SIZE;
+            new_key = (key + i) % ARR_SIZE;
         }
 
         // Decrease capacity
@@ -106,7 +112,7 @@ public class HashTable {
 
     // Need to make a better hash function
     private int hash(int item) {
-        return item % 5003;
+        return item % 8089;
     }
 
     // Prints the hash table in the same format as Java's own HashTable
