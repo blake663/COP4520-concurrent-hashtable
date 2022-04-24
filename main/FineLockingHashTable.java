@@ -1,6 +1,6 @@
 import java.util.concurrent.locks.Lock;
 
-public class FineLockingHashTable {
+public class FineLockingHashTable implements HashTableInterface {
     public static final int ARR_SIZE = 809; // The maximum capacity of a HashTable
     private Integer[] table = new Integer[ARR_SIZE]; // Where values are stored
     private boolean[] cleans = new boolean[ARR_SIZE]; // Where clean indices are stored
