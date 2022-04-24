@@ -1,13 +1,15 @@
 public class HashTable {
     public static final int ARR_SIZE = 64708; // The maximum capacity of a HashTable
-    private Integer[] table = new Integer[ARR_SIZE]; // Where values are stored
+    private int[] table = new int[ARR_SIZE]; // Where values are stored
+    private boolean[] nulls = new boolean[ARR_SIZE]; // If a value is null, it is true at the same index here
     private boolean[] cleans = new boolean[ARR_SIZE]; // Where clean indices are stored
     private int capacity;
 
     public HashTable() {
         // Generate arrays, each with default values. Set capacity to 0
         for (int i = 0; i < ARR_SIZE; i++) {
-            table[i] = null;
+            table[i] = 0;
+            nulls[i] = true;
             cleans[i] = true;
         }
         capacity = 0;
@@ -23,8 +25,9 @@ public class HashTable {
         long key = hash(item);
 
         // Check if first try addition
-        if (table[(int) key] == null) {
+        if (nulls[(int) key]) {
             table[(int) key] = item;
+            nulls[(int) key] = false;
             cleans[(int) key] = false;
         }
         // Otherwise, quadratically probe for empty indices
@@ -32,7 +35,7 @@ public class HashTable {
             long i = 1;
             long new_key = (key + i) % ARR_SIZE;
             try {
-                while (table[(int) new_key] != null) {
+                while (!nulls[(int) new_key]) {
                     i++;
                     // if (item == 64708) System.out.println(String.format("i: %d, key: %d, new key:
                     // %d, item: %d", i, key, new_key, item));
@@ -44,6 +47,7 @@ public class HashTable {
                 System.err.println(String.format("i: %d, key: %d, new key: %d, item: %d", i, key, new_key, item));
             }
             table[(int) new_key] = item;
+            nulls[(int) new_key] = false;
             cleans[(int) new_key] = false;
         }
 
@@ -60,7 +64,7 @@ public class HashTable {
         // Dirty indices are considered to be a collision, the item may of been probed
         // farther down
         while (!cleans[new_key]) {
-            if (item == table[new_key] && table[new_key] != null) {
+            if (item == table[new_key] && !nulls[new_key]) {
                 return true;
             }
             i++;
@@ -88,7 +92,8 @@ public class HashTable {
         // farther down
         while (!cleans[new_key]) {
             if (item == table[new_key]) {
-                table[new_key] = null;
+                nulls[new_key] = true;
+                table[new_key] = 0;
                 break;
             }
             i++;
@@ -120,7 +125,7 @@ public class HashTable {
 
         int index = 0, found = 0;
         while (found <= capacity && index < ARR_SIZE) {
-            if (table[index] != null) {
+            if (!nulls[index]) {
                 s += hash(table[index]) + "=" + table[index] + ", ";
                 found++;
             }

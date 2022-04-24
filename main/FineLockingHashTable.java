@@ -2,7 +2,8 @@ import java.util.concurrent.locks.Lock;
 
 public class FineLockingHashTable {
     public static final int ARR_SIZE = 809; // The maximum capacity of a HashTable
-    private Integer[] table = new Integer[ARR_SIZE]; // Where values are stored
+    private int[] table = new int[ARR_SIZE]; // Where values are stored
+    private boolean[] nulls = new boolean[ARR_SIZE]; // If a value is null, it is true at the same index here
     private boolean[] cleans = new boolean[ARR_SIZE]; // Where clean indices are stored
     private Lock[] locks = new Lock[ARR_SIZE]; // locks for each item
     private int capacity;
@@ -10,7 +11,8 @@ public class FineLockingHashTable {
     public FineLockingHashTable() {
         // Generate arrays, each with default values. Set capacity to 0
         for (int i = 0; i < ARR_SIZE; i++) {
-            table[i] = null;
+            table[i] = 0;
+            nulls[i] = true;
             cleans[i] = true;
         }
         capacity = 0;
@@ -29,11 +31,12 @@ public class FineLockingHashTable {
         int i = 0;
         int new_key = (key + (i * i)) % ARR_SIZE;
         while (true) {
-            if (table[new_key] == null) {
+            if (nulls[new_key]) {
                 locks[new_key].lock();
                 // Make sure still null
-                if (table[new_key] == null) {
+                if (nulls[new_key]) {
                     table[new_key] = item;
+                    nulls[new_key] = false;
                     cleans[new_key] = false;
                     locks[new_key].unlock();
                     break;
@@ -58,8 +61,7 @@ public class FineLockingHashTable {
         // Dirty indices are considered to be a collision, the item may of been probed
         // farther down
         while (!cleans[new_key]) {
-            // may be able to remove "table[new_key] != null"
-            if (item == table[new_key] && table[new_key] != null) {
+            if (item == table[new_key] && !nulls[new_key]) {
                 return true;
             }
             i++;
@@ -88,7 +90,8 @@ public class FineLockingHashTable {
         while (!cleans[new_key]) {
             if (item == table[new_key]) {
                 locks[new_key].lock();
-                table[new_key] = null;
+                nulls[new_key] = true;
+                table[new_key] = 0;
                 locks[new_key].unlock();
                 break;
             }
@@ -121,7 +124,7 @@ public class FineLockingHashTable {
 
         int index = 0, found = 0;
         while (found <= capacity && index < ARR_SIZE) {
-            if (table[index] != null) {
+            if (!nulls[index]) {
                 s += hash(table[index]) + "=" + table[index] + ", ";
                 found++;
             }
