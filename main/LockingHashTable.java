@@ -1,15 +1,13 @@
 public class LockingHashTable {
     public static final int ARR_SIZE = 64708; // The maximum capacity of a HashTable
-    private int[] table = new int[ARR_SIZE]; // Where values are stored
-    private boolean[] nulls = new boolean[ARR_SIZE]; // If a value is null, it is true at the same index here
+    private Integer[] table = new Integer[ARR_SIZE]; // Where values are stored
     private boolean[] cleans = new boolean[ARR_SIZE]; // Where clean indices are stored
     private int capacity;
 
     public LockingHashTable() {
         // Generate arrays, each with default values. Set capacity to 0
         for (int i = 0; i < ARR_SIZE; i++) {
-            table[i] = 0;
-            nulls[i] = true;
+            table[i] = null;
             cleans[i] = true;
         }
         capacity = 0;
@@ -25,21 +23,19 @@ public class LockingHashTable {
         int key = hash(item);
 
         // Check if first try addition
-        if (nulls[key]) {
+        if (table[key] == null) {
             table[key] = item;
-            nulls[key] = false;
             cleans[key] = false;
         }
         // Otherwise, quadratically probe for empty indices
         else {
             int i = 1;
             int new_key = (key + i) % ARR_SIZE;
-            while (!nulls[new_key]) {
+            while (table[new_key] != null) {
                 i++;
                 new_key = (new_key + i) % ARR_SIZE;
             }
             table[new_key] = item;
-            nulls[new_key] = false;
             cleans[new_key] = false;
         }
 
@@ -56,7 +52,8 @@ public class LockingHashTable {
         // Dirty indices are considered to be a collision, the item may of been probed
         // farther down
         while (!cleans[new_key]) {
-            if (item == table[new_key] && !nulls[new_key]) {
+            if (table[new_key] == null) {
+            } else if (item == table[new_key]) {
                 return true;
             }
             i++;
@@ -84,8 +81,7 @@ public class LockingHashTable {
         // farther down
         while (!cleans[new_key]) {
             if (item == table[new_key]) {
-                nulls[new_key] = true;
-                table[new_key] = 0;
+                table[new_key] = null;
                 break;
             }
             i++;
@@ -117,7 +113,7 @@ public class LockingHashTable {
 
         int index = 0, found = 0;
         while (found <= capacity && index < ARR_SIZE) {
-            if (!nulls[index]) {
+            if (table[index] != null) {
                 s += hash(table[index]) + "=" + table[index] + ", ";
                 found++;
             }
