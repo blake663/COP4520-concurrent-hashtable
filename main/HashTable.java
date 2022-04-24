@@ -112,8 +112,8 @@ public class HashTable {
     }
 
     // Need to make a better hash function
-    private int hash(int item) {
-        return item % 64708;
+    private int hash(Integer item) {
+        return (item.hashCode()) % ARR_SIZE;
     }
 
     // Prints the hash table in the same format as Java's own HashTable
