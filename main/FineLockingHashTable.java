@@ -17,10 +17,10 @@ public class FineLockingHashTable {
     }
 
     // Add an item to the hash table
-    public void put(int item) {
+    public boolean put(int item) {
         // If capacity if full, do not add
         if (capacity >= ARR_SIZE)
-            return;
+            return false;
 
         // Get key
         int key = hash(item);
@@ -47,6 +47,7 @@ public class FineLockingHashTable {
 
         // Increase capacity
         capacity++;
+        return true;
     }
 
     // Search the hash table for a specific item, return true if found, else false
