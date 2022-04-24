@@ -66,14 +66,14 @@ public class LockingHashTable {
     }
 
     // Removes an item from the hash table
-    public synchronized void remove(int item) {
+    public synchronized boolean remove(int item) {
         int key = hash(item);
         int i = 0;
         int new_key = (key + i) % ARR_SIZE;
 
         // If item not in hash table, no need to look for it again
         if (!search(item)) {
-            return;
+            return false;
         }
 
         // Quadratically probe for the item
@@ -90,6 +90,7 @@ public class LockingHashTable {
 
         // Decrease capacity
         capacity--;
+        return true;
     }
 
     // Returns amount of items in hash table
