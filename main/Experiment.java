@@ -12,7 +12,7 @@ public class Experiment {
     static ArrayList<Long> javaTimes = new ArrayList<Long>();
 
     public static void main(String[] args) throws ParseException, InterruptedException {
-        int N = 10;
+        int N = 250;
         for (int n = 0; n < N; n++) {
             System.out.println("//////////////////////////////////////////////////////");
             // Unthreaded

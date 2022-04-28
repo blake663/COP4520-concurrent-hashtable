@@ -37,3 +37,4 @@ conference_101719.tex
 *.blg
 references.bib
 main/experimentalTimes.txt
+*.pyc
