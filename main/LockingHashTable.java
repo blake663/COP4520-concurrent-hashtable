@@ -105,7 +105,7 @@ public class LockingHashTable implements HashTableInterface {
 
     // Need to make a better hash function
     private int hash(Integer item) {
-        return (item.hashCode()) % ARR_SIZE;
+        return Math.abs((item.hashCode()) % ARR_SIZE);
     }
 
     // Prints the hash table in the same format as Java's own HashTable
