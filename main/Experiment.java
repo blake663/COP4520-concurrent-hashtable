@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -9,7 +12,8 @@ public class Experiment {
     static ArrayList<Long> lockingTimes = new ArrayList<Long>();
 
     public static void main(String[] args) throws ParseException, InterruptedException {
-        for (int n = 0; n < 10; n++) {
+        int N = 100;
+        for (int n = 0; n < N; n++) {
             System.out.println("//////////////////////////////////////////////////////");
             // Unthreaded
             UnthreadedExperiment standard_u = new UnthreadedExperiment();
@@ -93,6 +97,28 @@ public class Experiment {
         System.out.println(unthreadedTimes);
         System.out.println(threadedTimes);
         System.out.println(lockingTimes);
+
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter("experimentalTimes.txt"));
+            for (int i = 0; i < N - 1; i++) {
+                out.write(unthreadedTimes.get(i) + ",");
+            }
+            out.write(unthreadedTimes.get(N - 1) + "\n");
+
+            for (int i = 0; i < N - 1; i++) {
+                out.write(threadedTimes.get(i) + ",");
+            }
+            out.write(threadedTimes.get(N - 1) + "\n");
+
+            for (int i = 0; i < N - 1; i++) {
+                out.write(lockingTimes.get(i) + ",");
+            }
+            out.write(lockingTimes.get(N - 1) + "\n");
+
+            out.close();
+        } catch (IOException e) {
+            System.out.println("Failed to create file");
+        }
     }
 }
 
