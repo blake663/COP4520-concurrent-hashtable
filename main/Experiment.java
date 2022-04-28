@@ -1,40 +1,98 @@
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Experiment {
+    static ArrayList<Long> unthreadedTimes = new ArrayList<Long>();
+    static ArrayList<Long> threadedTimes = new ArrayList<Long>();
+    static ArrayList<Long> lockingTimes = new ArrayList<Long>();
+
     public static void main(String[] args) throws ParseException, InterruptedException {
         for (int n = 0; n < 10; n++) {
-            ThreadedRandomExperiment[] standard = new ThreadedRandomExperiment[8];
+            System.out.println("//////////////////////////////////////////////////////");
+            // Unthreaded
+            UnthreadedExperiment standard_u = new UnthreadedExperiment();
+            Thread single = new Thread(standard_u, "Single");
+            single.start();
+            single.join();
+            // System.out.println("Finished unthreaded experiment on standard hash
+            // table.\n");
+            ThreadedExperiment[] standard = new ThreadedExperiment[8];
             Thread[] nonlocking = new Thread[8];
-            System.out.println("\n////////////////////////////////////////////////////////////////////////////////\n");
+
             // Nonlocking threaded
             for (int i = 0; i < 8; i++) {
-                standard[i] = new ThreadedRandomExperiment(i);
+                standard[i] = new ThreadedExperiment(i);
                 nonlocking[i] = new Thread(standard[i], Integer.toString(i));
             }
 
             long startTime = System.nanoTime();
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < 8; i++)
                 nonlocking[i].start();
-            }
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < 8; i++)
                 nonlocking[i].join();
-            }
             long endTime = System.nanoTime();
             long duration = (endTime - startTime);
 
-            System.out.println(String.format(
-                    "Randomized threaded standard hashtable took %d milliseconds", duration / 1000000));
+            /*
+             * System.out.println(String.format(
+             * "Threaded standard hashtable took %d milliseconds to perform 64708 inserts, 129416 searches, and 64708 deletes"
+             * ,
+             * duration / 1000000));
+             */
+            threadedTimes.add(duration / 1000000);
             int insertion_failures = 0;
             int removal_failures = 0;
             for (int i = 0; i < 8; i++) {
                 insertion_failures += standard[i].insertion_failures;
                 removal_failures += standard[i].removal_failures;
             }
-            System.out.println(String.format("Insertion failed %d times, and deletion failed %d times.",
-                    insertion_failures, removal_failures));
-            System.out.println("Finished threaded experiment on standard hash table.\n");
+            System.out.println(
+                    String.format("Nonlocking threaded insertion failed %d times, and deletion failed %d times.",
+                            insertion_failures, removal_failures));
+            // System.out.println("Finished threaded experiment on standard hash table.\n");
+
+            // Locking threaded
+            ThreadedExperiment2[] locking_experiment = new ThreadedExperiment2[8];
+            Thread[] locking = new Thread[8];
+
+            for (int i = 0; i < 8; i++) {
+                locking_experiment[i] = new ThreadedExperiment2(i);
+                locking[i] = new Thread(locking_experiment[i], Integer.toString(i));
+            }
+
+            startTime = System.nanoTime();
+            for (int i = 0; i < 8; i++)
+                locking[i].start();
+            for (int i = 0; i < 8; i++)
+                locking[i].join();
+            endTime = System.nanoTime();
+            duration = (endTime - startTime);
+
+            /*
+             * System.out.println(String.format(
+             * "Threaded locking hashtable took %d milliseconds to perform 64708 inserts, 129416 searches, and 64708 deletes"
+             * ,
+             * duration / 1000000));
+             */
+            lockingTimes.add(duration / 1000000);
+            insertion_failures = 0;
+            removal_failures = 0;
+            for (int i = 0; i < 8; i++) {
+                insertion_failures += locking_experiment[i].insertion_failures;
+                removal_failures += locking_experiment[i].removal_failures;
+            }
+            System.out
+                    .println(String.format("Locking threaded insertion failed %d times, and deletion failed %d times.",
+                            insertion_failures, removal_failures));
+            // System.out.println("Finished threaded experiment on the locking hash
+            // table.");
+
         }
+        System.out.println(unthreadedTimes);
+        System.out.println(threadedTimes);
+        System.out.println(lockingTimes);
     }
 }
 
@@ -69,11 +127,17 @@ class UnthreadedExperiment implements Runnable {
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
 
-        System.out.println(String.format(
-                "Unthreaded standard hashtable took %d milliseconds to perform 64708 inserts, 129416 searches, and 64708 deletes",
-                duration / 1000000));
-        System.out.println(String.format("Insertion failed %d times, and deletion failed %d times.", insertion_failures,
-                removal_failures));
+        /*
+         * System.out.println(String.format(
+         * "Unthreaded standard hashtable took %d milliseconds to perform 64708 inserts, 129416 searches, and 64708 deletes"
+         * ,
+         * duration / 1000000));
+         */
+        System.out.println(
+                String.format("Unthreaded insertion failed %d times, and deletion failed %d times.", insertion_failures,
+                        removal_failures));
+
+        Experiment.unthreadedTimes.add(duration / 1000000);
     }
 }
 
@@ -141,14 +205,14 @@ class ThreadedExperiment2 implements Runnable {
 }
 
 class ThreadedRandomExperiment implements Runnable {
-    HashTable standard_unthreaded;
+    ConcurrentHashMap<Integer, Integer> standard_unthreaded;
     public int insertion_failures; // How many times the insertion of a key-value failed.
     public int removal_failures; // How many times the removal of a key-value failed.
     int thread_num;
     Random random;
 
     ThreadedRandomExperiment(int thread_num) {
-        this.standard_unthreaded = new HashTable();
+        this.standard_unthreaded = new ConcurrentHashMap<Integer, Integer>();
         this.insertion_failures = 0;
         this.removal_failures = 0;
         this.thread_num = thread_num;
@@ -158,17 +222,16 @@ class ThreadedRandomExperiment implements Runnable {
     public void run() {
         for (int i = 0; i < 1000; i++) {
             int randomFunc = random.nextInt(2);
-            int num = random.nextInt();
+            int num = random.nextInt(50);
             switch (randomFunc) {
                 case 0:
-                    standard_unthreaded.put(num);
-                    if (!standard_unthreaded.search(num)) {
+                    standard_unthreaded.put(num, num);
+                    if (!standard_unthreaded.contains(num)) {
                         insertion_failures++;
                     }
                     break;
                 case 1:
-                    standard_unthreaded.remove(num);
-                    if (!standard_unthreaded.search(num)) {
+                    if (!standard_unthreaded.remove(num, num)) {
                         removal_failures++;
                     }
                     break;
