@@ -70,20 +70,22 @@ has two common models: shared memory models and message passing models. This pap
 a concurrent hash table will utilize a shared memory model. A shared memory model works by having concurrent processors read and write objects into the
 memory that they share [3].
 
-\section{Algorithms}
-% And this is how I did it!
-% \begin{lstlisting}[language={Java},caption=Testing surce code in \LaTeX{}.,breaklines=true,frame=single]
-% class HashTable<T> {
-%     bool isConcurrent;
-%     public static void main(String[] args) {
-%         isConcurrent = true;
-%     }
+\subsection{Challenges of Concurrency}
+The largest challenge of creating any concurrent program is the concept of thread safety. For a data structure or algorithm to be consider threadsafe, it 
+must behave correctly when multiple threads are using it, without additional instructions from the function calling it. There are many strategies to utilize for
+creating a threadsafe data structure. One such strategy is known as \emph{confinement}, which avoids the issue of threads reading and writing to the same
+memory location because all the data is confined to a single thread, and the other threads do not have the ability to read or write to memory directly.
+Another strategy is \emph{immutability}, which means that the information which the threads share will be immutable, meaning they are unable to be altered by
+the threads. Other than those two, there is also the strategy of utilizing \emph{threadsafe data types}. Naturally utilizing data types that are already designed
+to be threadsafe helps when creating threadsafe algorithms and data structures because these data types are designed to not fail when multiple threads are being used
+[4]. There is one final strategy for desgining a threadsafe program, and that is to synchronized the threads so that they do not attempt to read or write to the same
+memory location at the same time. The most common way to implement thread synchronization in shared memory models is the use of locks. The way locks works is by taking
+the part of the program that accesses the data, and creating a "lock" around it. What this lock does is prevent multiple threads from being with in the "locked" region
+of the code. If a thread will attempt to enter the "locked" region, while another thread is already inside of it, the other thread will be a frozen 
+until the lock is removed and the thread will be able to access the region, reinitiating the lock again to prevent another thread from entering. Now that no other threads
+can enter the "locked" region, the thread inside of it is able to alter the memory location without having any other threads attempting to access it at the same time.
 
-%     public HashTable<T>(bool isConcurrent) {
-%         this.isConcurrent = isConcurrent;
-%     }
-% }
-% \end{lstlisting}
+\section{Algorithms}
 There are many ways to create single-threaded hash tables, so there are likewise many ways to create concurrent hash tables. If we ignore the need for resizing and
 the choice of hashing algorithm, we still need to decide on an approach for handling contention. We will attempt to employ methods such as course-grain locking, fine-grain locking,
 lazy, optimistic, and lock-free design. 
@@ -91,25 +93,14 @@ lazy, optimistic, and lock-free design.
 \section{Experimental Results}
 We begin by testing how the standard hash table will performed when run sequentially, and then when multithreaded.
 
-\section{Appendix}
-\subsection{Challenges}
-One of the major challenges the group came across was learning how to do concurrent programming within Java, as most of the group member's experience
-lay in C++.
-\subsection{Completed Tasks}
-\begin{itemize}
-    \item Creating a standard hash table.
-    \item Creating a hash table with locks.
-\end{itemize}
-\subsection{Remaining Tasks}
-\begin{itemize}
-    \item Creating a lock-free hash table.
-    \item More experimental testing.
-\end{itemize}
-
 \begin{thebibliography}{00}
 \bibitem{b1} R. Sedgewick and K. Wayne. ``Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
 \bibitem{b2} S. Mitra. ``Hashing." utexas.edu. https://www.cs.utexas.edu/~mitra/\\csSpring2017/cs313/lectures/hash.html (accessed Mar. 13, 2022).
 \bibitem{b3} S. Amarasinghe, A. Chlipala, S. Devadas, M. Ernst, M. Goldman, J. Guttag, D. Jackson, R. Miller, M. Rinard, and A. Solar-Lezama. ``Reading 17: Concurrency"
 mit.edu. https://web.mit.edu/6.005/\\www/fa14/classes/17-concurrency/ (accessed Mar. 14, 2022).
+\bibitem{b3} S. Amarasinghe, A. Chlipala, S. Devadas, M. Ernst, M. Goldman, J. Guttag, D. Jackson, R. Miller, M. Rinard, and A. Solar-Lezama. ``Reading 18: Thread Safety"
+mit.edu. http://web.mit.edu/6.005/\\www/fa14/classes/18-thread-safety/ (accessed Apr. 20, 2022).
+\bibitem{b3} S. Amarasinghe, A. Chlipala, S. Devadas, M. Ernst, M. Goldman, J. Guttag, D. Jackson, R. Miller, M. Rinard, and A. Solar-Lezama. ``Reading 20: Queues \& Locks"
+mit.edu. http://web.mit.edu/6.005/\\www/fa14/classes/20-queues-locks/(accessed Apr. 20, 2022).
 \end{thebibliography}
 \end{document}
