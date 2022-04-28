@@ -1,4 +1,4 @@
-public class LockingHashTable {
+public class LockingHashTable implements HashTableInterface {
     public static final int ARR_SIZE = 64708; // The maximum capacity of a HashTable
     private Integer[] table = new Integer[ARR_SIZE]; // Where values are stored
     private boolean[] cleans = new boolean[ARR_SIZE]; // Where clean indices are stored
@@ -67,14 +67,14 @@ public class LockingHashTable {
     }
 
     // Removes an item from the hash table
-    public synchronized void remove(int item) {
+    public synchronized boolean remove(int item) {
         int key = hash(item);
         int i = 0;
         int new_key = (key + i) % ARR_SIZE;
 
         // If item not in hash table, no need to look for it again
         if (!search(item)) {
-            return;
+            return false;
         }
 
         // Quadratically probe for the item
@@ -91,6 +91,7 @@ public class LockingHashTable {
 
         // Decrease capacity
         capacity--;
+        return true;
     }
 
     // Returns amount of items in hash table
@@ -103,8 +104,8 @@ public class LockingHashTable {
     }
 
     // Need to make a better hash function
-    private int hash(int item) {
-        return item % 64708;
+    private int hash(Integer item) {
+        return Math.abs((item.hashCode()) % ARR_SIZE);
     }
 
     // Prints the hash table in the same format as Java's own HashTable
