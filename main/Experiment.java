@@ -3,16 +3,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Experiment {
     static ArrayList<Long> unthreadedTimes = new ArrayList<Long>();
     static ArrayList<Long> threadedTimes = new ArrayList<Long>();
     static ArrayList<Long> lockingTimes = new ArrayList<Long>();
+    static ArrayList<Long> javaTimes = new ArrayList<Long>();
 
     public static void main(String[] args) throws ParseException, InterruptedException {
-        int N = 100;
+        int N = 3;
         for (int n = 0; n < N; n++) {
             System.out.println("//////////////////////////////////////////////////////");
             // Unthreaded
@@ -93,27 +93,52 @@ public class Experiment {
             // System.out.println("Finished threaded experiment on the locking hash
             // table.");
 
+            JavaConcurrent[] java_experiment = new JavaConcurrent[8];
+            Thread[] java_locking = new Thread[8];
+
+            for (int i = 0; i < 8; i++) {
+                java_experiment[i] = new JavaConcurrent(i);
+                java_locking[i] = new Thread(java_experiment[i], Integer.toString(i));
+            }
+
+            startTime = System.nanoTime();
+            for (int i = 0; i < 8; i++)
+                java_locking[i].start();
+            for (int i = 0; i < 8; i++)
+                java_locking[i].join();
+            endTime = System.nanoTime();
+            duration = (endTime - startTime);
+
+            /*
+             * System.out.println(String.format(
+             * "Threaded locking hashtable took %d milliseconds to perform 64708 inserts, 129416 searches, and 64708 deletes"
+             * ,
+             * duration / 1000000));
+             */
+            javaTimes.add(duration / 1000000);
+            insertion_failures = 0;
+            removal_failures = 0;
+            for (int i = 0; i < 8; i++) {
+                insertion_failures += java_experiment[i].insertion_failures;
+                removal_failures += java_experiment[i].removal_failures;
+            }
+            System.out
+                    .println(String.format("Java threaded insertion failed %d times, and deletion failed %d times.",
+                            insertion_failures, removal_failures));
+
         }
         System.out.println(unthreadedTimes);
         System.out.println(threadedTimes);
         System.out.println(lockingTimes);
+        System.out.println(javaTimes);
 
         try {
-            BufferedWriter out = new BufferedWriter(new FileWriter("experimentalTimes.txt"));
-            for (int i = 0; i < N - 1; i++) {
-                out.write(unthreadedTimes.get(i) + ",");
+            BufferedWriter out = new BufferedWriter(new FileWriter("experimentalTimes.csv"));
+            out.write("Unthreaded,Nonlocking,Locking,Java\n");
+            for (int i = 0; i < N; i++) {
+                out.write(String.format("%d,%d,%d,%d\n", unthreadedTimes.get(i), threadedTimes.get(i),
+                        lockingTimes.get(i), javaTimes.get(i)));
             }
-            out.write(unthreadedTimes.get(N - 1) + "\n");
-
-            for (int i = 0; i < N - 1; i++) {
-                out.write(threadedTimes.get(i) + ",");
-            }
-            out.write(threadedTimes.get(N - 1) + "\n");
-
-            for (int i = 0; i < N - 1; i++) {
-                out.write(lockingTimes.get(i) + ",");
-            }
-            out.write(lockingTimes.get(N - 1) + "\n");
 
             out.close();
         } catch (IOException e) {
@@ -230,38 +255,33 @@ class ThreadedExperiment2 implements Runnable {
     }
 }
 
-class ThreadedRandomExperiment implements Runnable {
-    ConcurrentHashMap<Integer, Integer> standard_unthreaded;
+class JavaConcurrent implements Runnable {
+    ConcurrentHashMap<Integer, Integer> threaded;
     public int insertion_failures; // How many times the insertion of a key-value failed.
     public int removal_failures; // How many times the removal of a key-value failed.
     int thread_num;
-    Random random;
 
-    ThreadedRandomExperiment(int thread_num) {
-        this.standard_unthreaded = new ConcurrentHashMap<Integer, Integer>();
+    JavaConcurrent(int thread_num) {
+        this.threaded = new ConcurrentHashMap<Integer, Integer>();
         this.insertion_failures = 0;
         this.removal_failures = 0;
         this.thread_num = thread_num;
-        this.random = new Random();
     }
 
     public void run() {
-        for (int i = 0; i < 1000; i++) {
-            int randomFunc = random.nextInt(2);
-            int num = random.nextInt(50);
-            switch (randomFunc) {
-                case 0:
-                    standard_unthreaded.put(num, num);
-                    if (!standard_unthreaded.contains(num)) {
-                        insertion_failures++;
-                    }
-                    break;
-                case 1:
-                    if (!standard_unthreaded.remove(num, num)) {
-                        removal_failures++;
-                    }
-                    break;
-            }
+        for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
+            threaded.put(i, i);
+        }
+        for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
+            if (!threaded.contains(i))
+                insertion_failures++;
+        }
+        for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
+            threaded.remove(i);
+        }
+        for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
+            if (threaded.contains(i))
+                removal_failures++;
         }
     }
 }
