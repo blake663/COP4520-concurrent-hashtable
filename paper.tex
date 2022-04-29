@@ -5,6 +5,7 @@
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{tabularx}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -136,7 +137,7 @@ The data we gathered includes total time taken, the CPU used, the amount of test
 \begin{table}[htbp]
     \caption{Experimental Results}
     \begin{center}
-    \begin{tabular}{|c|c|c|c|c|}
+    \begin{tabularx}{\columnwidth}{|X|X|X|X|X|}
     \hline
     \textbf{Data}&\multicolumn{4}{|c|}{\textbf{Hash Table Version}} \\
     \cline{2-5} 
@@ -152,11 +153,14 @@ The data we gathered includes total time taken, the CPU used, the amount of test
     \hline
     \textbf{Total time}&\multicolumn{4}{|c|}{\textbf{2,180,629 ms}} \\
     \hline
-    \multicolumn{5}{l}{Nonlocking and Threaded are the same class, but the latter was concurrently tested}
-    \end{tabular}
+    \multicolumn{5}{l}{Threaded is Nonlocking but concurrently tested instead}
+    \end{tabularx}
     \label{tab1}
     \end{center}
 \end{table}
+
+
+
 
 \begin{thebibliography}{00}
 \bibitem{b1} R. Sedgewick and K. Wayne. ``Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
