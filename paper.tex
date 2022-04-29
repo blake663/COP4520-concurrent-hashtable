@@ -244,6 +244,16 @@ public boolean put(int item) {
 }
 \end{lstlisting}
 
+The source code shown in "Listing 4" contains the \verb|put()| method for a fine-grain locking hash table. This method resembles the
+\verb|put()| method for the coarse-grain locking hash table, but differs in a few key ways. The first notable difference is the lack of 
+the \verb|syncrhonized| keyword in the method declaration. This means a call to this method would not block other threads from calling the
+method until the call finishes. Rather, this method implements the use of locks to block threads at the critical sections of the code, the
+critical section being the writing of the item into the hash table. What this code does is check to see if the memory location that the 
+data will be stored in is null, and then acquires the lock for that location. Once the lock is acquired, the method checks once again that
+memory location is null to ensure no other calls to the method wrote data in the time between checking and acquiring the lock. Once the data
+is added to the hash table, the lock will be relinquished and other thread will be able to continue with their method calls. The only other
+notable difference between the coarse-grain and fine-grain methods is that the fine-grain one utilizes quadratic probing.
+
 \begin{lstlisting}[language={Java},caption=Source code for the fine-grain search() method.,captionpos=b,breaklines=true,frame=single]
 public boolean search(int item) {
     int key = hash(item);
@@ -265,6 +275,12 @@ public boolean search(int item) {
     return false;
 }
 \end{lstlisting}
+
+The fine-grain \verb|search()| method is once again notably similar to its coarse-grain counterpart. The only difference between the two
+is difference in probing methods. The reasoning behind this is that since search only reads data from the array and does not write any,
+there is no reason for it to acquire a lock at any point in its runtime. The program has no reason to block access to the memory location
+in order to read it, and if data was being written to the memory location during the call to \verb|search()| then search would be blocked
+by \verb|put()| or \verb|remove| acquiring the lock to that memory location.
 
 \begin{lstlisting}[language={Java},caption=Source code for the fine-grain remove() method.,captionpos=b,breaklines=true,frame=single]
 public boolean remove(int item) {
