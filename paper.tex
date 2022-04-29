@@ -86,10 +86,38 @@ until the lock is removed and the thread will be able to access the region, rein
 can enter the "locked" region, the thread inside of it is able to alter the memory location without having any other threads attempting to access it at the same time.
 
 \section{Algorithms}
-There are many ways to create single-threaded hash tables, so there are likewise many ways to create concurrent hash tables. If we ignore the need for resizing and
-the choice of hashing algorithm, we still need to decide on an approach for handling contention. We will attempt to employ methods such as course-grain locking, fine-grain locking,
-lazy, optimistic, and lock-free design. 
+\subsection{Basic Hashtable}
+\begin{lstlisting}[language={Java},caption=Source code for the course-grain put() method.,captionpos=b,breaklines=true,frame=single]
+public synchronized boolean put(int item) {
+    // If capacity if full, do not add
+    if (capacity >= ARR_SIZE)
+        return false;
 
+    // Get key
+    int key = hash(item);
+
+    // Check if first try addition
+    if (table[key] == null) {
+        table[key] = item;
+        cleans[key] = false;
+    }
+    // Otherwise, quadratically probe for empty indices
+    else {
+        int i = 1;
+        int new_key = (key + i) % ARR_SIZE;
+        while (table[new_key] != null) {
+            i++;
+            new_key = (new_key + i) % ARR_SIZE;
+        }
+        table[new_key] = item;
+        cleans[new_key] = false;
+    }
+
+    // Increase capacity
+    capacity++;
+    return true;
+}
+\end{lstlisting}
 \section{Experimental Results}
 We begin by testing how the standard hash table will performed when run sequentially, and then when multithreaded.
 
