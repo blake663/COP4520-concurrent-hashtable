@@ -4,6 +4,7 @@
 \usepackage{listings}
 \usepackage{hyperref}
 \usepackage{amsmath}
+\usepackage{graphicx}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -119,7 +120,43 @@ public synchronized boolean put(int item) {
 }
 \end{lstlisting}
 \section{Experimental Results}
-We begin by testing how the standard hash table will performed when run sequentially, and then when multithreaded.
+We began by testing how the standard hash table will performed when run sequentially, and then when multithreaded. 
+After those tests, we created a locking hash table and proceeded to run tests on that version. 
+After both of those tests, we deicded it would be a good idea to test our hash tables to Java's native concurrent hash map, the closest thing to a concurrent hash table Java has to offer natively.
+Our measurement for testing was timing how long each hash table takes to add a specific amount of numbers, make sure each one was added, remove all those numbers, and then make sure each was removed. 
+We recorded all the measurements into a CSV file and used a Python program to analyze the numbers, using Pandas to do the math and Matplotlib and Seaborn to visualize the data gathered. 
+We were able to gather a plentiful amount of information regarding each hash table and the time it takes to do these processes. 
+The data we gathered includes total time taken, the CPU used, the amount of tests, the time it took to do each test for each hash table, the average, low, and high times, and the standard deviation. All times recorded are in millisecconds. 
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=90mm,scale=1]{250trials.png}}
+    \caption{Graphs of each test for each hash table. The x-axis is the test number, the y-axis is the time in ms the test took. }
+    \label{fig}
+\end{figure}
+
+\begin{table}[htbp]
+    \caption{Experimental Results}
+    \begin{center}
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    \textbf{Data}&\multicolumn{4}{|c|}{\textbf{Hash Table Version}} \\
+    \cline{2-5} 
+    \textbf{Calculation} & \textbf{\textit{Nonlocking}}& \textbf{\textit{Threaded}}& \textbf{\textit{Locked Threaded}}& \textbf{\textit{Java}} \\
+    \hline
+    \textbf{Average}& 8,135 ms& 130 ms&  5 ms& 272 ms\\
+    \hline
+    \textbf{High}& 10,978 ms& 145 ms&  66 ms& 1,499 ms\\
+    \hline
+    \textbf{Low}& 8164 ms& 118 ms&  4 ms& 247 ms\\
+    \hline
+    \textbf{Deviation}& 376.3 ms& 4.5 ms&  4.1 ms& 78.7 ms\\
+    \hline
+    \textbf{Total time}&\multicolumn{4}{|c|}{\textbf{2,180,629 ms}} \\
+    \hline
+    \multicolumn{5}{l}{Nonlocking and Threaded are the same class, but the latter was concurrently tested}
+    \end{tabular}
+    \label{tab1}
+    \end{center}
+\end{table}
 
 \begin{thebibliography}{00}
 \bibitem{b1} R. Sedgewick and K. Wayne. ``Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
