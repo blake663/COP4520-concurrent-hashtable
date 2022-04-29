@@ -180,6 +180,35 @@ The unthreaded tests took, on average, 25\% longer to finish the first set of te
 The same can especially be seen in the locking and Java tests, taking approximately 16.5 and 5.5 times longer than the average.
 The speculated reason is the amount of time it takes for everything to be set up correctly the first time around. After that, the classes are already in memory and nothing new need to be set up.
 
+\begin{lstlisting}[language={Java},caption=Source code for the experiment used in each test,captionpos=b,breaklines=true,frame=single]
+    public void run() {
+        for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
+            table.put(i);
+        }
+        for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
+            if (!table.search(i))
+                insertion_failures++;
+        }
+        for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
+            table.remove(i);
+        }
+        for (int i = (this.thread_num * 8089); i < (this.thread_num * 8089) + 8089; i++) {
+            if (table.search(i))
+                removal_failures++;
+        }
+    }
+\end{lstlisting}
+
+In order to test if the hash tables work correctly, the \verb|run()| function was created, one for each experiment, each exactly the same, except for the Java hash map.
+The Java hash map's \verb|run()| function used \verb|table.put(i, i)| and \verb|table.contains(i)| in place of \verb|table.put(i)| and \verb|table.search(i)|, respectively. 
+In each test, each thread (for the threadded tests) was given a number, from 0 to the number of threads used in the test. The thread will then proceed to \verb|put()| in a series of numbers.
+After the series of numbers is added the the table, the thread will then, using the same series of numbers, search the table for those numbers.
+If the table failed to find a number, the insertion failures would increase, signified by the \verb|insertion_failures++;|. After that, the thread will then remove the same series of numbers from the table.
+Similar to the previous search, the thread will then search for the same series of numbers. However, if the number was found, the removal failed and the removal failure count would increment.
+This is signifed by the \verb|removal_failures++;| when \verb|table.search()| was successful.
+The variables \verb|insertional_failures| and \verb|removal_failures| are both public and static, so each thread and the overall experiment have access to it. 
+The \verb|table| variable, for each experiment, was different per hash table testing. For nonthreaded and locked, \verb|table = new HashTable()|.
+For Java hash maps, we set \verb|table| to \verb|ConcurrentHashMap<Integer, Integer>()| and for locked, we set it to \verb|LockingHashTable()|
 
 \begin{thebibliography}{00}
 \bibitem{b1} R. Sedgewick and K. Wayne. ``Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
