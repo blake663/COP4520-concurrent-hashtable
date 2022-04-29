@@ -401,6 +401,12 @@ The variables \verb|insertional_failures| and \verb|removal_failures| are both p
 The \verb|table| variable, for each experiment, was different per hash table testing. For nonthreaded and locked, \verb|table = new HashTable()|.
 For Java hash maps, we set \verb|table| to \verb|ConcurrentHashMap<Integer, Integer>()| and for locked, we set it to \verb|LockingHashTable()|
 
+
+Follow up work:
+
+In the future, we might follow up this research by including other types of hash sets and performing more varied testing. It would be interesting to consider a lock-free tables, such as the lock-free hash set from The Art of Multiprocessor Programming. That table would likely have very different performance characteristics, given it's lock-free nature and unique overhead of maintaining a linked-list and buckets. 
+We could also expand our testing to include different percentages of insertions, deletions, and reads. This might reveal other differences in performance. 
+
 \begin{thebibliography}{00}
 \bibitem{b1} R. Sedgewick and K. Wayne. ``Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
 \bibitem{b2} S. Mitra. ``Hashing." utexas.edu. https://www.cs.utexas.edu/~mitra/\\csSpring2017/cs313/lectures/hash.html (accessed Mar. 13, 2022).
