@@ -120,6 +120,13 @@ public synchronized boolean put(int item) {
     return true;
 }
 \end{lstlisting}
+
+The code outlined in "Listing 1" is the put() method for the coarse-grain hash table created for this project. As it is a course grain hash table,
+it utilizes the \emph{synchronized} keyword to make a lock on this function, meaning that if one thread were to be in the middle of a call to this function
+then any thread that attempted to call it would have to wait until the original thread finished it's function call. Since this implementation uses a fixed size 
+hash table, the method will first check to see if the hash table has reached it's maximum capacity. If the hash table is full, then the method returns false,
+indicating that the attempt to put the item into the hash table was unsuccessful. In the case that the hash table still has unused memory, then the method
+will create a key for the item by hashing it, and checks to see if the memory location associated with that key has been used yet.
 \section{Experimental Results}
 We began by testing how the standard hash table will performed when run sequentially, and then when multithreaded. 
 After those tests, we created a locking hash table and proceeded to run tests on that version. 
@@ -158,9 +165,6 @@ The data we gathered includes total time taken, the CPU used, the amount of test
     \label{tab1}
     \end{center}
 \end{table}
-
-
-
 
 \begin{thebibliography}{00}
 \bibitem{b1} R. Sedgewick and K. Wayne. ``Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
