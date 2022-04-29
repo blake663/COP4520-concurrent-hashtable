@@ -198,7 +198,7 @@ public synchronized boolean remove(int item) {
 
 
 \section{Experimental Results}
-We began by testing how the standard hash table will performed when run sequentially, and then when multithreaded. 
+We began by testing how the standard hash table will perform when run sequentially, and then when multi-threaded. 
 After those tests, we created a locking hash table and proceeded to run tests on that version. 
 After both of those tests, we deicded it would be a good idea to test our hash tables to Java's native concurrent hash map, the closest thing to a concurrent hash table Java has to offer natively.
 Our measurement for testing was timing how long each hash table takes to add a specific amount of numbers, make sure each one was added, remove all those numbers, and then make sure each was removed. 
