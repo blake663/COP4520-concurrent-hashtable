@@ -166,6 +166,21 @@ The data we gathered includes total time taken, the CPU used, the amount of test
     \end{center}
 \end{table}
 
+Gathered from this data, we were able to come to some conclusions about the types of hash tables we created and the Java native concurrent hash map.
+The hash table that was created without concurrency in mind was slow, taking approximately 8 seconds per test. The deviation was relatively low at around 375 ms, 4\% of a difference from the average.
+The same hash table tested concurrently was much faster, able to do the same test but 60 times faster. The standard deviation, compared to the previous test, was significantly lower. 
+The test done after that one was the locking hash table, which performed significantly faster than even the concurrent non-locking one, completing the tests 26 times faster, 5 ms per test. 
+Contrary to previous thoughts, the Java hash map performed the second worst, averaging at 272 ms per test. \\
+These tests and theories gave us insight into some possible issues with our versions.
+The first of which, signified by the locking hash table tests, is that our testing methodology may not be perfect and have flaws that would make it seem good, but only in the case we gave it.
+Instead of thee same test everytime, we could randomize more numbers being added and removed, but adding that ability would slow the overall tests as we need to know which random numbers are being added and removed.
+That would slow down the tests themselves instead of changing the outcome of the tests. 
+While not a flaw, another phenominom that was noticed was the amount of time each hash table took to complete the first set of tests. 
+The unthreaded tests took, on average, 25\% longer to finish the first set of tests, eventually converging to about 8 seconds.
+The same can especially be seen in the locking and Java tests, taking approximately 16.5 and 5.5 times longer than the average.
+The speculated reason is the amount of time it takes for everything to be set up correctly the first time around. After that, the classes are already in memory and nothing new need to be set up.
+
+
 \begin{thebibliography}{00}
 \bibitem{b1} R. Sedgewick and K. Wayne. ``Hash Tables." princeton.edu. \\https://algs4.cs.princeton.edu/34hash/ (accessed Mar. 13, 2022).
 \bibitem{b2} S. Mitra. ``Hashing." utexas.edu. https://www.cs.utexas.edu/~mitra/\\csSpring2017/cs313/lectures/hash.html (accessed Mar. 13, 2022).
