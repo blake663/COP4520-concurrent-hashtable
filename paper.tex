@@ -207,6 +207,96 @@ that the value was in the array. Once the memory location with the value has bee
 will decrease the \verb|capacity| variable, so that the hash table knows how many values are stored inside of it, and then returns true to indicate that the value
 was removed from the table successfully.
 
+\subsection{Fine-Grain Locking Hashtable}
+
+\begin{lstlisting}[language={Java},caption=Source code for the fine-grain put() method.,captionpos=b,breaklines=true,frame=single]
+public boolean put(int item) {
+    // If capacity if full, do not add
+    if (capacity >= ARR_SIZE)
+        return false;
+
+    // Get key
+    int key = hash(item);
+
+    // Quadratically probe for empty indices
+    int i = 0;
+    int new_key = (key + (i * i)) % ARR_SIZE;
+    while (true) {
+        if (table[new_key] == null) {
+            locks[new_key].lock();
+            // Make sure still null
+            if (table[new_key] == null) {
+                table[new_key] = item;
+                cleans[new_key] = false;
+                locks[new_key].unlock();
+                break;
+            }
+            locks[new_key].unlock();
+        }
+
+        i++;
+        new_key = (new_key + (i * i)) % ARR_SIZE;
+    }
+
+    // Increase capacity
+    capacity++;
+    return true;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language={Java},caption=Source code for the fine-grain search() method.,captionpos=b,breaklines=true,frame=single]
+public boolean search(int item) {
+    int key = hash(item);
+    int i = 0;
+    int new_key = (key + (i * i)) % ARR_SIZE;
+    // Quadratically probe for the item
+    // Dirty indices are considered to be a collision, the item may of been probed
+    // farther down
+    while (!cleans[new_key]) {
+        if (item == table[new_key]) {
+            return true;
+        }
+        i++;
+        new_key = (new_key + (i * i)) % ARR_SIZE;
+        if (i >= ARR_SIZE)
+            break;
+    }
+
+    return false;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language={Java},caption=Source code for the fine-grain remove() method.,captionpos=b,breaklines=true,frame=single]
+public boolean remove(int item) {
+    int key = hash(item);
+    int i = 0;
+    int new_key = (key + (i * i)) % ARR_SIZE;
+
+    // If item not in hash table, no need to look for it again
+    if (!search(item)) {
+        return false;
+    }
+
+    // Quadratically probe for the item
+    // Dirty indices are considered to be a collision, the item may of been probed
+    // farther down
+    while (!cleans[new_key]) {
+        if (item == table[new_key]) {
+            locks[new_key].lock();
+            table[new_key] = null;
+            locks[new_key].unlock();
+            break;
+        }
+        i++;
+        new_key = (new_key + (i * i)) % ARR_SIZE;
+    }
+
+    // Decrease capacity
+    capacity--;
+    return true;
+}
+\end{lstlisting}
+
 \section{Experimental Results}
 We began by testing how the standard hash table will perform when run sequentially, and then when multi-threaded. 
 After those tests, we created a locking hash table and proceeded to run tests on that version. 
