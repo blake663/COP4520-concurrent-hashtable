@@ -139,7 +139,7 @@ public synchronized boolean search(int item) {
     int key = hash(item);
     int i = 0;
     int new_key = (key + i) % ARR_SIZE;
-    // Quadratically probe for the item
+    // Linearly probe for the item
     // Dirty indices are considered to be a collision, the item may of been probed
     // farther down
     while (!cleans[new_key]) {
@@ -178,7 +178,7 @@ public synchronized boolean remove(int item) {
         return false;
     }
 
-    // Quadratically probe for the item
+    // Linearly probe for the item
     // Dirty indices are considered to be a collision, the item may of been probed
     // farther down
     while (!cleans[new_key]) {
@@ -196,6 +196,16 @@ public synchronized boolean remove(int item) {
 }
 \end{lstlisting}
 
+"Listing 3" contains the code for coarse-grain locking hash table's \verb|remove()| method. The method is used to remove the value given to the method from the
+hash table. It begin's by calculating the initial key for that value by utilizing the hash table's \verb|hash()| method. After it calculates the key, the method
+makes a call to \verb|search()| to see if the value is in the hash table. If the value has not been added, then there is no way to remove it and the \verb|remove()|
+function returns false, due to the impossible nature of removing it. Now that the \verb|remove()| method is aware that the value it is trying to remove
+exists within the hash table, it needs to find and remove the value. It does this by utilizing the same exact loop from the \verb|search()| function, which 
+revolves around testing locations in the \verb|clean| to see if there has ever been data at this memory location in the hash table. The loop will continually check
+every single location that the data could have been placed into until it finds it, which the method is guaranteed to do as the call to \verb|search()| indicated
+that the value was in the array. Once the memory location with the value has been found, it is set to null in order to remove it from memory. After that, \verb|remove()|
+will decrease the \verb|capacity| variable, so that the hash table knows how many values are stored inside of it, and then returns true to indicate that the value
+was removed from the table successfully.
 
 \section{Experimental Results}
 We began by testing how the standard hash table will perform when run sequentially, and then when multi-threaded. 
