@@ -88,7 +88,7 @@ until the lock is removed and the thread will be able to access the region, rein
 can enter the "locked" region, the thread inside of it is able to alter the memory location without having any other threads attempting to access it at the same time.
 
 \section{Algorithms}
-\subsection{Basic Hashtable}
+\subsection{Coarse-Grain Locking Hashtable}
 \begin{lstlisting}[language={Java},caption=Source code for the course-grain put() method.,captionpos=b,breaklines=true,frame=single]
 public synchronized boolean put(int item) {
     // If capacity if full, do not add
@@ -103,7 +103,7 @@ public synchronized boolean put(int item) {
         table[key] = item;
         cleans[key] = false;
     }
-    // Otherwise, quadratically probe for empty indices
+    // Otherwise, linearly probe for empty indices
     else {
         int i = 1;
         int new_key = (key + i) % ARR_SIZE;
@@ -121,12 +121,82 @@ public synchronized boolean put(int item) {
 }
 \end{lstlisting}
 
-The code outlined in "Listing 1" is the put() method for the coarse-grain hash table created for this project. As it is a course grain hash table,
-it utilizes the \emph{synchronized} keyword to make a lock on this function, meaning that if one thread were to be in the middle of a call to this function
-then any thread that attempted to call it would have to wait until the original thread finished it's function call. Since this implementation uses a fixed size 
-hash table, the method will first check to see if the hash table has reached it's maximum capacity. If the hash table is full, then the method returns false,
+The code outlined in "Listing 1" is the \verb|put()| method for the coarse-grain hash table created for this project. As it is a course grain hash table,
+it utilizes the \verb|synchronized| keyword to make a lock on this method, meaning that if one thread were to be in the middle of a call to this method
+then any thread that attempted to call it would have to wait until the original thread finished it's method call. Since this implementation uses a fixed size hash table, 
+the method will first check to see if the hash table has reached it's maximum capacity. If the hash table is full, then the method returns false,
 indicating that the attempt to put the item into the hash table was unsuccessful. In the case that the hash table still has unused memory, then the method
-will create a key for the item by hashing it, and checks to see if the memory location associated with that key has been used yet.
+will create a key for the item by hashing it, and checks to see if the memory location associated with that key has been used yet. If no other key is associated
+with that memory location, then we add the item to the array at that location, and change the clean array so the hash table will know that data was stored 
+at this memory location for the linear probing in the \verb|remove()| method. If that memory location already has data associated with it, then the method will
+begin linear probing. The way linear probing works is by simply incrementing the key value by one, and checking that memory location. If the memory location
+is empty, then the method will store the item at that key value, otherwise, the method will continue to increment and check until it finds a memory location
+that is unused. After the value has been put in to the hash table, the hash table's capacity variable is increased to signify how many items are in it, and 
+the method call will finally return true to indicate that the value has been added successfully.
+
+\begin{lstlisting}[language={Java},caption=Source code for the course-grain search() method.,captionpos=b,breaklines=true,frame=single]
+public synchronized boolean search(int item) {
+    int key = hash(item);
+    int i = 0;
+    int new_key = (key + i) % ARR_SIZE;
+    // Quadratically probe for the item
+    // Dirty indices are considered to be a collision, the item may of been probed
+    // farther down
+    while (!cleans[new_key]) {
+        if (table[new_key] == null) {
+        } else if (item == table[new_key]) {
+            return true;
+        }
+        i++;
+        new_key = (new_key + i) % ARR_SIZE;
+        if (i >= ARR_SIZE)
+            break;
+    }
+
+    return false;
+}
+\end{lstlisting}
+
+The code outlined in "Listing 2" shows the \verb|search()| method for the coarse-grain hash table created for this project. This method's purpose is to accept 
+a value, and then check the locations in the hashtable where it could be stored for it. It does this by first acquiring the first key for that item with the
+\verb|hash()| method. After the method has the initial key associated with that value, it will check to see if that key is stored in the array at that location.
+It does this by creating a loop that checks to see the \verb|clean| array contains any data. What this accomplishes is a simple test, if there is no data in the \verb|clean| array
+then the item has never been put into the hash table, otherwise, there is a possibility that the value has been put in and is located here or further into
+the hash table due to linear probing. In the case that the locations checked in the \verb|clean| array are ever empty, the while loop is broken and the method returns
+false, indicating that the item has not been found. The while loop will continually check different locations inside the \verb|clean| array to see if they are equal to
+the item that is being searched for. If the item is found, the method returns true, otherwise the method will loop until every single memory location in the hash table has
+been checked and returns false.
+
+\begin{lstlisting}[language={Java},caption=Source code for the course-grain remove() method.,captionpos=b,breaklines=true,frame=single]
+public synchronized boolean remove(int item) {
+    int key = hash(item);
+    int i = 0;
+    int new_key = (key + i) % ARR_SIZE;
+
+    // If item not in hash table, no need to look for it again
+    if (!search(item)) {
+        return false;
+    }
+
+    // Quadratically probe for the item
+    // Dirty indices are considered to be a collision, the item may of been probed
+    // farther down
+    while (!cleans[new_key]) {
+        if (item == table[new_key]) {
+            table[new_key] = null;
+            break;
+        }
+        i++;
+        new_key = (new_key + i) % ARR_SIZE;
+    }
+
+    // Decrease capacity
+    capacity--;
+    return true;
+}
+\end{lstlisting}
+
+
 \section{Experimental Results}
 We began by testing how the standard hash table will performed when run sequentially, and then when multithreaded. 
 After those tests, we created a locking hash table and proceeded to run tests on that version. 
