@@ -202,7 +202,7 @@ We began by testing how the standard hash table will performed when run sequenti
 After those tests, we created a locking hash table and proceeded to run tests on that version. 
 After both of those tests, we deicded it would be a good idea to test our hash tables to Java's native concurrent hash map, the closest thing to a concurrent hash table Java has to offer natively.
 Our measurement for testing was timing how long each hash table takes to add a specific amount of numbers, make sure each one was added, remove all those numbers, and then make sure each was removed. 
-We recorded all the measurements into a CSV file and used a Python program to analyze the numbers, using Pandas to do the math and Matplotlib and Seaborn to visualize the data gathered. 
+We recorded all the measurements into a CSV file and used a Python program to analyze the numbers, using Pandas to do the math and Matplotlib and Seaborn to visualize the data gathered. The file used to evaluate the data, "evaluation.py," can be found in the GitHub repository used for this project.
 We were able to gather a plentiful amount of information regarding each hash table and the time it takes to do these processes. 
 The data we gathered includes total time taken, the CPU used, the amount of tests, the time it took to do each test for each hash table, the average, low, and high times, and the standard deviation. All times recorded are in millisecconds. 
 \begin{figure}[htbp]
@@ -230,7 +230,7 @@ The data we gathered includes total time taken, the CPU used, the amount of test
     \hline
     \textbf{Total time}&\multicolumn{4}{|c|}{\textbf{2,180,629 ms}} \\
     \hline
-    \multicolumn{5}{l}{Threaded is Nonlocking but concurrently tested instead}
+    \multicolumn{5}{l}{CPU used for testing was a AMD Ryzen 5 3600X 6-Core Processor}
     \end{tabularx}
     \label{tab1}
     \end{center}
