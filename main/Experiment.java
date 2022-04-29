@@ -193,13 +193,12 @@ class UnthreadedExperiment implements Runnable {
 }
 
 class ThreadedExperiment implements Runnable {
-    HashTable standard_unthreaded;
+    final HashTable standard_unthreaded = new HashTable();
     public int insertion_failures; // How many times the insertion of a key-value failed.
     public int removal_failures; // How many times the removal of a key-value failed.
     int thread_num;
 
     ThreadedExperiment(int thread_num) {
-        this.standard_unthreaded = new HashTable();
         this.insertion_failures = 0;
         this.removal_failures = 0;
         this.thread_num = thread_num;
