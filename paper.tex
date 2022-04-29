@@ -296,6 +296,11 @@ public boolean remove(int item) {
     return true;
 }
 \end{lstlisting}
+For the fine-grain \verb|remove()| method, we start the same way as the other \verb|remove()| methods used in the other hash tables.
+Get the key and search the table for a value with that key. If it is not found, there is no need to try to remove the value, otherwise we just continue.
+If the table does have the value, we start to look for that value, and in this version, we quadratically probe to search for it. We continually check if the node is clean or not, dirty nodes mean there was never a value there and not worth checking onwards.
+When we encounter a clean node, we end. If we find the node we are searching for, we first start by locking it. After locking, we set the node to null and unlock it. After that, we break from the search and return true because we successfully removed the value.
+If we are still going through dirty nodes, we quadratically increase the index because we are quadratically probing. After all of that, we decrease the capacity of the table and return true.
 
 \section{Experimental Results}
 We began by testing how the standard hash table will perform when run sequentially, and then when multi-threaded. 
